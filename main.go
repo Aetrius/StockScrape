@@ -32,7 +32,7 @@ func main() {
 	// Get OS parameter
 	// =====================
 	flag.StringVar(&configFile, "config", "config.yml", "configuration file")
-	flag.StringVar(&bind, "bind", "0.0.0.0:9104", "bind")
+	flag.StringVar(&bind, "bind", "0.0.0.0:9109", "bind")
 	flag.Parse()
 
 	// =====================
@@ -141,6 +141,5 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 		}
 		log.Infof(fmt.Sprintf("------------------------------------------------------------------------------------------"))
-		//fmt.Println(val)
 	}
 }
