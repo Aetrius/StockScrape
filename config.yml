@@ -8,5 +8,6 @@ metrics:
       - "https://www.livecoinwatch.com/price/Fantom-FTM"
       - "https://www.livecoinwatch.com/price/Dogecoin-DOGE"
       - "https://www.livecoinwatch.com/price/USDCoin-USDC"
+      - "https://www.livecoinwatch.com/price/Cardano-ADA"
     type: gauge
     description: "Exports the current coin value based on the web scrape"
