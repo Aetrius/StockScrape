@@ -5,7 +5,7 @@ This project is utilized to scrape a web endpoints to utilize client data rather
 
 ## Features
 
-- Select URLs From LiveCoinWatch.com for coin metrics
+- Select URLs From stockwatch.com for Stock metrics
 - Prometheus Exporter
 - Dockerized
 
@@ -24,13 +24,12 @@ Please note you will need to target the url of a specific page with a coin based
 
 ```
     metrics:
-    crypto:
+    stock:
         url: 
-        - "https://www.livecoinwatch.com/price/Avalanche-AVAX"
-        - "https://www.livecoinwatch.com/price/Ethereum-ETH"
-        - "https://www.livecoinwatch.com/price/Bitcoin-BTC"
+        - "https://www.stockwatch.com/Quote/Detail?U:TSLA"
+        - "https://www.stockwatch.com/Quote/Detail?U:RIVN"
         type: gauge
-        description: "Exports the current coin value based on the web scrape"
+        description: "Exports the current stock value based on the web scrape"
 
 ```
 
@@ -44,7 +43,7 @@ Please note you will need to target the url of a specific page with a coin based
 - Additional Query Metrics
 
 ## Related Sources
-[Live Coin Watch](https://www.livecoinwatch.com/price/Cardano-ADA)
+[Stock Watch](https://www.stockwatch.com/Quote/Detail?U:TSLA)
 
 [Web Scrape Resource](https://www.scrapingbee.com/blog/web-scraping-go/)
 
