@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly"
 
@@ -17,7 +19,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var config Config
+var coinConfig CoinConfig
 
 const (
 	collector = "query_exporter"
@@ -43,7 +45,7 @@ func main() {
 	}
 
 	// Load yaml
-	if err := yaml.Unmarshal(b, &config); err != nil {
+	if err := yaml.Unmarshal(b, &coinConfig); err != nil {
 		log.Errorf("Failed to load config: %s", err)
 		os.Exit(1)
 	}
@@ -74,13 +76,11 @@ func main() {
 // =============================
 // Config config structure
 // =============================
-type Config struct {
-	DSN     string
+type CoinConfig struct {
 	Metrics map[string]struct {
-		Query       string
+		URL         []string
 		Type        string
 		Description string
-		Labels      []string
 		Value       string
 		metricDesc  *prometheus.Desc
 	}
@@ -93,79 +93,54 @@ type QueryCollector struct{}
 
 // Describe prometheus describe
 func (e *QueryCollector) Describe(ch chan<- *prometheus.Desc) {
-	for metricName, metric := range config.Metrics {
+	for metricName, metric := range coinConfig.Metrics {
 		metric.metricDesc = prometheus.NewDesc(
 			prometheus.BuildFQName(collector, "", metricName),
 			metric.Description,
-			metric.Labels, nil,
+			[]string{"coin"}, nil,
 		)
-		config.Metrics[metricName] = metric
+		coinConfig.Metrics[metricName] = metric
 		log.Infof("metric description for \"%s\" registerd", metricName)
 	}
 }
 
 // Collect prometheus collect
 func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
+	//var val float64
+	for metricName, metric := range coinConfig.Metrics {
+		log.Infof("metric description for \"%s\" registerd", metricName)
+		data := make(map[string]string)
 
-	c := colly.NewCollector()
-	c.OnHTML("div.official-name", func(e *colly.HTMLElement) {
-		e.ForEach("span", func(_ int, el *colly.HTMLElement) {
-			fmt.Println(el.ChildText("span:nth-child(1)"))
-			/*writer.Write([]string{
-				el.ChildText("td:nth-child(1)"),
-				el.ChildText("td:nth-child(2)"),
-				el.ChildText("td:nth-child(3)"),
-			})*/
-		})
-		fmt.Println("Scrapping Complete")
-	})
-	//c.Visit("https://www.livecoinwatch.com/")
-	c.Visit("https://www.livecoinwatch.com/price/Cardano-ADA")
-	// Execute each queries in metrics
-	//for name, metric := range config.Metrics {
+		for url := range metric.URL {
 
-	/*// Execute query
-	rows, err := db.Query(metric.Query)
-	if err != nil {
-		log.Errorf("Failed to execute query: %s", err)
-		continue
+			c := colly.NewCollector()
+			coinName := ""
+			c.OnHTML("div.official-name", func(e *colly.HTMLElement) {
+				coinName = ""
+				e.ForEach("div.price-container", func(_ int, el *colly.HTMLElement) {
+					coinName = e.ChildText("h2:nth-child(1)")
+
+				})
+
+				e.ForEach("div.coin-price-large", func(_ int, el *colly.HTMLElement) {
+					coinResult := e.ChildText("span:nth-child(1)")
+					coinResult = strings.ReplaceAll(coinResult, "$", "")
+					result, err := strconv.ParseFloat(coinResult, 8)
+					data[coinName] = fmt.Sprintf("%f", result)
+					//fmt.Println(time.Now().Format("01-02-2006 15:04:05"), coinName, coinResult)
+					log.Infof(fmt.Sprintf("Coin: %s, Price: %s", coinName, coinResult))
+					if err != nil {
+						panic(err)
+
+					}
+					ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.GaugeValue, result, coinName)
+				})
+
+			})
+			c.Visit(metric.URL[url])
+
+		}
+		log.Infof(fmt.Sprintf("------------------------------------------------------------------------------------------"))
+		//fmt.Println(val)
 	}
-
-	// Get column info
-	cols, err := rows.Columns()
-	if err != nil {
-		log.Errorf("Failed to get column meta: %s", err)
-		continue
-	}
-
-	des := make([]interface{}, len(cols))
-	res := make([][]byte, len(cols))
-	for i := range cols {
-		des[i] = &res[i]
-	}*/
-
-	// fetch database
-	/*for rows.Next() {
-	rows.Scan(des...)
-	data := make(map[string]string)
-	for i, bytes := range res {
-		data[cols[i]] = string(bytes)
-	}
-
-	// Metric labels
-	labelVals := []string{}
-	for _, label := range metric.Labels {
-		labelVals = append(labelVals, data[label])
-		//Replace labelVals with the string arrays
-	}*/
-
-	// Metric value
-	//val, _ := strconv.ParseFloat(data[metric.Value], 64)
-	//Replace val with the counter value
-
-	// Add metric
-	//ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.GaugeValue, val, labelVals...)
-
-	//}
-	//}
 }

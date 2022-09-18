@@ -1,20 +1,8 @@
-dsn: test:test123@tcp(127.0.0.1:3306)/information_schema
 metrics:
-  process_count_by_host:
-    query: "select user,
-                  substring_index(host, ':', 1) host,
-                  count(*) sessions 
-            from information_schema.processlist
-            group by 1,2 "
+  crypto:
+    url: 
+      - "https://www.livecoinwatch.com/price/Avalanche-AVAX"
+      - "https://www.livecoinwatch.com/price/Ethereum-ETH"
+      - "https://www.livecoinwatch.com/price/Bitcoin-BTC"
     type: gauge
-    description: "process count by host"
-    labels: ["user","host"]
-    value: sessions
-  process_count_by_user:
-    query: "select user, count(*) sessions 
-            from information_schema.processlist 
-            group by 1 "
-    type: gauge
-    description: "process count by user"
-    labels: ["user"]
-    value: sessions
+    description: "Exports the current coin value based on the web scrape"
