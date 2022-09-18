@@ -1,4 +1,4 @@
-# Crypto 💸🌐 Web Scraper & Exporter
+# Stock 💸🌐 Web Scraper & Exporter
 
 This project is utilized to scrape a web endpoints to utilize client data rather than utilize a paid API. Freemium at the cost of my own hardware computing power and storage.
 

@@ -1,14 +1,7 @@
 metrics:
-  crypto:
+  stock:
     url: 
-      - "https://www.livecoinwatch.com/price/Avalanche-AVAX"
-      - "https://www.livecoinwatch.com/price/Ethereum-ETH"
-      - "https://www.livecoinwatch.com/price/Bitcoin-BTC"
-      - "https://www.livecoinwatch.com/price/API3-API3"
-      - "https://www.livecoinwatch.com/price/Fantom-FTM"
-      - "https://www.livecoinwatch.com/price/Dogecoin-DOGE"
-      - "https://www.livecoinwatch.com/price/USDCoin-USDC"
-      - "https://www.livecoinwatch.com/price/Cardano-ADA"
-      - "https://www.livecoinwatch.com/price/Cronos-CRO"
+      - "https://www.stockwatch.com/Quote/Detail?U:RIVN"
+      - "https://www.stockwatch.com/Quote/Detail?U:TSLA"
     type: gauge
     description: "Exports the current coin value based on the web scrape"

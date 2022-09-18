@@ -21,7 +21,7 @@ RUN go mod tidy
 
 RUN go build -o /crypto-exporter
 
-EXPOSE 9109
+EXPOSE 9111
 
 CMD [ "/crypto-exporter" ]
 

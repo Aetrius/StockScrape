@@ -32,7 +32,7 @@ func main() {
 	// Get OS parameter
 	// =====================
 	flag.StringVar(&configFile, "config", "config.yml", "configuration file")
-	flag.StringVar(&bind, "bind", "0.0.0.0:9109", "bind")
+	flag.StringVar(&bind, "bind", "0.0.0.0:9111", "bind")
 	flag.Parse()
 
 	// =====================
@@ -97,7 +97,7 @@ func (e *QueryCollector) Describe(ch chan<- *prometheus.Desc) {
 		metric.metricDesc = prometheus.NewDesc(
 			prometheus.BuildFQName(collector, "", metricName),
 			metric.Description,
-			[]string{"coin"}, nil,
+			[]string{"stock"}, nil,
 		)
 		coinConfig.Metrics[metricName] = metric
 		log.Infof("metric description for \"%s\" registerd", metricName)
@@ -115,15 +115,21 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 			c := colly.NewCollector()
 			coinName := ""
-			c.OnHTML("div.official-name", func(e *colly.HTMLElement) {
+			c.OnHTML("div#MainContent_Quote1_Table1_TableDiv", func(e *colly.HTMLElement) {
 				coinName = ""
-				e.ForEach("div.price-container", func(_ int, el *colly.HTMLElement) {
-					coinName = e.ChildText("h2:nth-child(1)")
+				var counter = 0
+				e.ForEach("a.qn.Name", func(_ int, el *colly.HTMLElement) {
+					if counter > 0 {
+						return
+					}
+					//fmt.Println(e.ChildText("a.qn.Name"))
+					coinName = e.ChildText("a.qn.Name")
+					counter++
 
 				})
 
-				e.ForEach("div.coin-price-large", func(_ int, el *colly.HTMLElement) {
-					coinResult := e.ChildText("span:nth-child(1)")
+				e.ForEach("td.UpdL", func(_ int, el *colly.HTMLElement) {
+					coinResult := e.ChildText("td.UpdL")
 					coinResult = strings.ReplaceAll(coinResult, "$", "")
 					result, err := strconv.ParseFloat(coinResult, 8)
 					data[coinName] = fmt.Sprintf("%f", result)

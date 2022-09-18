@@ -4,4 +4,4 @@ services:
     image: crypto-exporter
     build: .
     ports:
-      - "9109:9109"
+      - "9111:9111"
